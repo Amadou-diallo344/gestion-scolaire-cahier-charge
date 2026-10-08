@@ -1,50 +1,54 @@
-const STORAGE_KEY = 'school-management-v1';
+const STORAGE_KEY = "school-management-v1";
 
 const defaultState = {
   classes: [
-    { id: crypto.randomUUID(), name: '6ème A', level: '6ème' },
-    { id: crypto.randomUUID(), name: '5ème B', level: '5ème' },
+    { id: crypto.randomUUID(), name: "6ème A", level: "6ème" },
+    { id: crypto.randomUUID(), name: "5ème B", level: "5ème" }
   ],
   students: [
-    { id: crypto.randomUUID(), firstName: 'Amina', lastName: 'Diallo', birthDate: '2012-05-10', classId: null },
-    { id: crypto.randomUUID(), firstName: 'Ibrahima', lastName: 'Sow', birthDate: '2011-08-15', classId: null },
+    { id: crypto.randomUUID(), firstName: "Amina", lastName: "Diallo", birthDate: "2012-05-10", classId: null },
+    { id: crypto.randomUUID(), firstName: "Ibrahima", lastName: "Sow", birthDate: "2011-08-15", classId: null }
   ],
   notes: [
-    { id: crypto.randomUUID(), studentId: null, subject: 'Mathématiques', type: 'Devoir', value: 15.5 },
-    { id: crypto.randomUUID(), studentId: null, subject: 'Français', type: 'Contrôle', value: 13 },
-  ],
+    { id: crypto.randomUUID(), studentId: null, subject: "Mathématiques", type: "Devoir", value: 15.5 },
+    { id: crypto.randomUUID(), studentId: null, subject: "Français", type: "Contrôle", value: 13 }
+  ]
 };
 
 const state = loadState();
 
-const classForm = document.getElementById('classForm');
-const studentForm = document.getElementById('studentForm');
-const noteForm = document.getElementById('noteForm');
+const classForm = document.getElementById("classForm");
+const studentForm = document.getElementById("studentForm");
+const noteForm = document.getElementById("noteForm");
 
-const classNameInput = document.getElementById('className');
-const classLevelInput = document.getElementById('classLevel');
-const studentFirstNameInput = document.getElementById('studentFirstName');
-const studentLastNameInput = document.getElementById('studentLastName');
-const studentBirthDateInput = document.getElementById('studentBirthDate');
-const studentClassSelect = document.getElementById('studentClass');
-const noteStudentSelect = document.getElementById('noteStudent');
-const noteSubjectInput = document.getElementById('noteSubject');
-const noteTypeSelect = document.getElementById('noteType');
-const noteValueInput = document.getElementById('noteValue');
+const classNameInput = document.getElementById("className");
+const classLevelInput = document.getElementById("classLevel");
+const studentFirstNameInput = document.getElementById("studentFirstName");
+const studentLastNameInput = document.getElementById("studentLastName");
+const studentBirthDateInput = document.getElementById("studentBirthDate");
+const studentClassSelect = document.getElementById("studentClass");
+const noteStudentSelect = document.getElementById("noteStudent");
+const noteSubjectInput = document.getElementById("noteSubject");
+const noteTypeSelect = document.getElementById("noteType");
+const noteValueInput = document.getElementById("noteValue");
 
 function loadState() {
   const saved = localStorage.getItem(STORAGE_KEY);
 
   if (!saved) {
     const seeded = JSON.parse(JSON.stringify(defaultState));
+
     seeded.classes[0].id = crypto.randomUUID();
     seeded.classes[1].id = crypto.randomUUID();
     seeded.students[0].id = crypto.randomUUID();
     seeded.students[1].id = crypto.randomUUID();
+
     seeded.students[0].classId = seeded.classes[0].id;
     seeded.students[1].classId = seeded.classes[1].id;
+
     seeded.notes[0].studentId = seeded.students[0].id;
     seeded.notes[1].studentId = seeded.students[1].id;
+
     localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
     return seeded;
   }
@@ -60,10 +64,6 @@ function getClassById(classId) {
   return state.classes.find((item) => item.id === classId);
 }
 
-function getStudentById(studentId) {
-  return state.students.find((item) => item.id === studentId);
-}
-
 function getStudentAverage(studentId) {
   const studentNotes = state.notes.filter((note) => note.studentId === studentId);
   if (!studentNotes.length) return 0;
@@ -77,14 +77,22 @@ function getClassCount(classId) {
 }
 
 function renderClassOptions() {
-  const options = state.classes
+  const classOptions = state.classes
     .map((classItem) => `<option value="${classItem.id}">${classItem.name}</option>`)
-    .join('');
+    .join("");
 
-  studentClassSelect.innerHTML = options || '<option value="">Aucune classe disponible</option>';
+  studentClassSelect.innerHTML = classOptions || '<option value="">Aucune classe</option>';
   noteStudentSelect.innerHTML = state.students
     .map((student) => `<option value="${student.id}">${student.firstName} ${student.lastName}</option>`)
-    .join('') || '<option value="">Aucun élève</option>';
+    .join("") || '<option value="">Aucun élève</option>';
+
+  if (state.classes.length && !studentClassSelect.value) {
+    studentClassSelect.value = state.classes[0].id;
+  }
+
+  if (state.students.length && !noteStudentSelect.value) {
+    noteStudentSelect.value = state.students[0].id;
+  }
 }
 
 function renderStats() {
@@ -93,13 +101,13 @@ function renderStats() {
   const allNotes = state.notes.map((note) => Number(note.value));
   const average = allNotes.length ? allNotes.reduce((a, b) => a + b, 0) / allNotes.length : 0;
 
-  document.getElementById('totalClasses').textContent = totalClasses;
-  document.getElementById('totalStudents').textContent = totalStudents;
-  document.getElementById('averageScore').textContent = average.toFixed(2);
+  document.getElementById("totalClasses").textContent = totalClasses;
+  document.getElementById("totalStudents").textContent = totalStudents;
+  document.getElementById("averageScore").textContent = average.toFixed(2);
 }
 
 function renderClassList() {
-  const classList = document.getElementById('classList');
+  const classList = document.getElementById("classList");
 
   if (!state.classes.length) {
     classList.innerHTML = '<p class="empty-state">Aucune classe enregistrée.</p>';
@@ -117,11 +125,11 @@ function renderClassList() {
         </div>
       `;
     })
-    .join('');
+    .join("");
 }
 
 function renderStudentList() {
-  const studentList = document.getElementById('studentList');
+  const studentList = document.getElementById("studentList");
 
   if (!state.students.length) {
     studentList.innerHTML = '<p class="empty-state">Aucun élève inscrit.</p>';
@@ -135,16 +143,16 @@ function renderStudentList() {
       return `
         <div class="item-box">
           <h3>${student.firstName} ${student.lastName}</h3>
-          <p>Classe : ${classItem ? classItem.name : 'Non affecté'}</p>
+          <p>Classe : ${classItem ? classItem.name : "Non affecté"}</p>
           <p>Moyenne : ${average.toFixed(2)}</p>
         </div>
       `;
     })
-    .join('');
+    .join("");
 }
 
 function renderNotesTable() {
-  const container = document.getElementById('notesTableContainer');
+  const container = document.getElementById("notesTableContainer");
 
   if (!state.students.length) {
     container.innerHTML = '<p class="empty-state">Aucune donnée de note pour le moment.</p>';
@@ -156,8 +164,8 @@ function renderNotesTable() {
       const studentNotes = state.notes.filter((note) => note.studentId === student.id);
       const average = getStudentAverage(student.id);
       const noteDetails = studentNotes.length
-        ? studentNotes.map((note) => `${note.subject} (${note.type}) : ${note.value}`).join('<br>')
-        : 'Aucune note';
+        ? studentNotes.map((note) => `${note.subject} (${note.type}) : ${note.value}`).join("<br>")
+        : "Aucune note";
 
       return `
         <tr>
@@ -168,7 +176,7 @@ function renderNotesTable() {
         </tr>
       `;
     })
-    .join('');
+    .join("");
 
   container.innerHTML = `
     <table>
@@ -195,7 +203,7 @@ function render() {
   renderNotesTable();
 }
 
-classForm.addEventListener('submit', (event) => {
+classForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
   const name = classNameInput.value.trim();
@@ -206,7 +214,7 @@ classForm.addEventListener('submit', (event) => {
   state.classes.push({
     id: crypto.randomUUID(),
     name,
-    level,
+    level
   });
 
   saveState();
@@ -214,7 +222,7 @@ classForm.addEventListener('submit', (event) => {
   render();
 });
 
-studentForm.addEventListener('submit', (event) => {
+studentForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
   const firstName = studentFirstNameInput.value.trim();
@@ -229,7 +237,7 @@ studentForm.addEventListener('submit', (event) => {
     firstName,
     lastName,
     birthDate,
-    classId,
+    classId
   });
 
   saveState();
@@ -237,7 +245,7 @@ studentForm.addEventListener('submit', (event) => {
   render();
 });
 
-noteForm.addEventListener('submit', (event) => {
+noteForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
   const studentId = noteStudentSelect.value;
@@ -252,7 +260,7 @@ noteForm.addEventListener('submit', (event) => {
     studentId,
     subject,
     type,
-    value,
+    value
   });
 
   saveState();
@@ -261,11 +269,3 @@ noteForm.addEventListener('submit', (event) => {
 });
 
 render();
-
-if (state.classes.length && !studentClassSelect.value) {
-  studentClassSelect.value = state.classes[0].id;
-}
-
-if (state.students.length && !noteStudentSelect.value) {
-  noteStudentSelect.value = state.students[0].id;
-}
